@@ -1,13 +1,11 @@
 package com.springstudy.controller;
 
 import com.springstudy.domain.Student;
+import com.springstudy.exception.StudentNotFound;
 import com.springstudy.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.persistence.PostLoad;
@@ -50,6 +48,29 @@ public class StudentController {
         studentService.save(student);
         return "redirect:/students";
     }
+    @GetMapping("/update")
+    public ModelAndView update(@RequestParam("id") Long id){
+        Student student = studentService.getById(id);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("student", student);
+        modelAndView.setViewName("studentForm");
+        return modelAndView;
+    }
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Long id){
+        studentService.delete(id);
+        return "redirect:/students";
+    }
+
+    @ExceptionHandler(StudentNotFound.class)
+    public ModelAndView handleStudentNotFound(StudentNotFound exception){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("message", exception.getMessage());
+        modelAndView.setViewName("notFound");
+        return modelAndView;
+    }
+
+
 
 
 }
